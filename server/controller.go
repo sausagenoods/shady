@@ -4,8 +4,10 @@ import (
 	"net/http"
 	"log"
 	"fmt"
+	"strings"
 
 	"github.com/go-chi/chi/v5"
+	"gitlab.com/moneropay/go-monero/walletrpc"
 )
 
 // Saves the encryption key to the database and responds with a Monero address
@@ -32,7 +34,7 @@ func encryptHandler(w http.ResponseWriter, r *http.Request) {
 		writeError(w, err)
 		return
 	}
-	fmt.Fprintf(w, "%s %s %d", id, address, Conf.amount)
+	fmt.Fprintf(w, "%s %s %s", id, address, strings.TrimRight(walletrpc.XMRToDecimal(Conf.amount), "0"))
 }
 
 // If the amount was paid, responds retrieves the key for the given id.

