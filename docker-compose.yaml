@@ -1,0 +1,59 @@
+services:
+  monero-wallet-rpc:
+    image: sethsimmons/simple-monero-wallet-rpc:v0.18.1.0
+    command: --wallet-file wallet --password-file wallet.passwd --disable-rpc-login --rpc-bind-port 18083 --daemon-host ${MONERO_DAEMON_RPC_HOSTNAME} --daemon-port ${MONERO_DAEMON_RPC_PORT} --confirm-external-bind --rpc-bind-ip 0.0.0.0 --max-log-files 0 --max-log-file-size 0
+    volumes:
+      - ./data/wallet:/home/monero
+    environment:
+      - DAEMON_HOST=${MONERO_DAEMON_RPC_HOSTNAME}
+      - DAEMON_PORT=${MONERO_DAEMON_RPC_PORT}
+      - RPC_USER=${MONERO_DAEMON_RPC_USERNAME}
+      - RPC_PASSWD=${MONERO_DAEMON_RPC_PASSWORD}
+    restart: unless-stopped
+
+  mpay-postgresql:
+    image: postgres:14-alpine
+    volumes:
+      - ./data/mpay-postgresql:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=${MPAY_PG_USER}
+      - POSTGRES_PASSWORD=${MPAY_PG_PASS}
+      - POSTGRES_DB=${MPAY_PG_DB}
+    restart: unless-stopped
+
+  moneropay:
+    image: registry.gitlab.com/moneropay/moneropay:v2
+    environment:
+      - RPC_ADDRESS=http://monero-wallet-rpc:18083/json_rpc
+      - POSTGRESQL=postgresql://${MPAY_PG_USER}:${MPAY_PG_PASS}@mpay-postgresql:5432/${MPAY_PG_DB}?sslmode=disable
+      - LOG_FORMAT=pretty
+    depends_on:
+      - monero-wallet-rpc
+      - mpay-postgresql
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:5001:5000"
+
+  shady-postgresql:
+    image: postgres:14-alpine
+    volumes:
+      - ./data/shady-postgresql:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=${SHADY_PG_USER}
+      - POSTGRES_PASSWORD=${SHADY_PG_PASS}
+      - POSTGRES_DB=${SHADY_PG_DB}
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:5433:5432"
+
+  shady:
+    build: server
+    environment:
+      - POSTGRESQL=postgresql://${SHADY_PG_USER}:${SHADY_PG_PASS}@shady-postgresql:5432/${SHADY_PG_DB}?sslmode=disable
+      - AMOUNT=1000
+    depends_on:
+      - moneropay
+      - shady-postgresql
+    restart: unless-stopped
+    ports:
+      - "0.0.0.0:1337:1337"
