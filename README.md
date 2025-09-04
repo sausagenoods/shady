@@ -2,10 +2,12 @@
 
 Very basic ransomware implementation that encrypts files, sends encryption keys to the API server, requests Monero from the user. Uses [MoneroPay](https://gitlab.com/moneropay/moneropay) to track payments sent by the victim. Provides an endpoint for the user to download keys to decrypt their files if the payment has arrived.
 
-That's right. The only way I will ever touch Powershell is if it's gonna be straight up malware. Universities need to stop teaching proprietary software that nobody uses. Teach a [real](https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html) shell, not a C# interpreter.
-
 >Now there's a MoneroPay powered ransomware that isn't the original Moneropay ransomware which wasn't powered by MoneroPay.\
 -- crtoff
+
+Do you need a pentest? Do you want to make sure your security tooling can effectively mitigate threats? Engage us here:
+
+[![Digilol penetration testing services](https://kernal.eu/posts/xmpp-enumeration/digilol-pentest-banner.png)](https://www.digilol.net)
 
 ## Server
 ### POST /encrypt
